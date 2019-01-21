@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Rendering.PostProcessing;
 
 [System.Serializable]
-[PostProcess(typeof(GrungeRenderer), PostProcessEvent.AfterStack, "TP/Grunge")]
+[PostProcess(typeof(GrungeRenderer), PostProcessEvent.AfterStack, "Kumu/Grunge")]
 public sealed class Grunge : PostProcessEffectSettings
 {
     [Range(0, 1)] public FloatParameter strength = new FloatParameter();
@@ -30,7 +30,7 @@ sealed class GrungeRenderer : PostProcessEffectRenderer<Grunge>
 
     public override void Render(PostProcessRenderContext context)
     {
-        var sheet = context.propertySheets.Get(Shader.Find("Hidden/TP/PostProcessing/Grunge"));
+        var sheet = context.propertySheets.Get(Shader.Find("Hidden/Kumu/Grunge"));
         if (settings.blendTexture.value == null)
         {
             return;

@@ -1,16 +1,4 @@
-﻿
-// struct BlendVaryings
-// {
-//     float4 vertex : SV_POSITION;
-//     float2 texcoord : TEXCOORD0;
-//     float2 texcoordStereo : TEXCOORD1;
-    
-// #if STEREO_INSTANCING_ENABLED
-//     uint stereoTargetEyeIndex : SV_RenderTargetArrayIndex;
-// #endif
-// }
-
-half4 blendNormal(half4 from, half4 to)
+﻿half4 blendNormal(half4 from, half4 to)
 {
 	return lerp(from, to, 0.5);
 }

@@ -1,12 +1,11 @@
-﻿Shader "Hidden/TP/PostProcessing/Grunge"
+﻿Shader "Hidden/Kumu/Grunge"
 {
 	HLSLINCLUDE
 	// for Unity 2018.2 or Newer
 		// #include "Packages/com.unity.postprocessing/PostProcessing/Shaders/StdLib.hlsl"
 	// for below Unity 2018.2 
 		#include "PostProcessing/Shaders/StdLib.hlsl"
-
-		#include "Assets/Plugins/TP/Scripts/Shaders/PostProcessing/PSBlending/PSBlend.hlsl"
+		#include "PSBlend.hlsl"
 
 
         TEXTURE2D_SAMPLER2D(_MainTex, sampler_MainTex);
