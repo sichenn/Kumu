@@ -10,9 +10,9 @@ Post processing effects made for Unity
 
 ## Uninstall
 1. Go to your Unity project folder
-1. run `git submodule deinit -f -- Assets/Plugins/TP   ` 
-1. run `rm -rf .git/modules/Assets/Plugins/TP`
-1. run `git rm -f Assets/Plugins/TP`
+1. run `git submodule deinit -f -- Assets/Plugins/Kumu'   ` 
+1. run `rm -rf .git/modules/Assets/Plugins/Kumu`
+1. run `git rm -f Assets/Plugins/Kumu`
 
 ## FAQ
 * Why doesn't this submodule go away when I checkout older commits?
