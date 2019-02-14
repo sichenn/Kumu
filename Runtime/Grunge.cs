@@ -30,11 +30,11 @@ sealed class GrungeRenderer : PostProcessEffectRenderer<Grunge>
 
     public override void Render(PostProcessRenderContext context)
     {
-        var sheet = context.propertySheets.Get(Shader.Find("Hidden/Kumu/Grunge"));
         if (settings.blendTexture.value == null)
         {
             return;
         }
+        var sheet = context.propertySheets.Get(Shader.Find("Hidden/Kumu/Grunge"));
 
 		sheet.properties.SetVector(ShaderIDs.Tiling, settings.tiling);
         sheet.properties.SetFloat(ShaderIDs.Strength, settings.strength);
