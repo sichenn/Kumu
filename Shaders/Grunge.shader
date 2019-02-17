@@ -2,9 +2,9 @@
 {
 	HLSLINCLUDE
 	// for Unity 2018.2 or Newer
-		// #include "Packages/com.unity.postprocessing/PostProcessing/Shaders/StdLib.hlsl"
+		#include "Packages/com.unity.postprocessing/PostProcessing/Shaders/StdLib.hlsl"
 	// for below Unity 2018.2 
-		#include "PostProcessing/Shaders/StdLib.hlsl"
+		// #include "PostProcessing/Shaders/StdLib.hlsl"
 		#include "PSBlend.hlsl"
 
 

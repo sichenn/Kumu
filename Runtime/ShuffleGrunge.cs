@@ -2,12 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering.PostProcessing;
-using TP.Tools;
 
 public class ShuffleGrunge : MonoBehaviour
 {
     public Texture2D[] textures;
-    [Label("Interval")]
     [Tooltip("Seconds until a grunge texture is shuffled")]
     [Range(0, 1)]
     public float intervalSeconds = 1;
