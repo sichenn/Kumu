@@ -14,24 +14,18 @@
 		half2 _Tiling;
 
 
-
         float4 Frag(VaryingsDefault i) : SV_Target
         {
             float4 color = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.texcoord);
 			float2 blendTexUV = i.texcoord * _Tiling;
 			float4 blendCol = SAMPLE_TEXTURE2D(_BlendTex, sampler_BlendTex, blendTexUV);
-
-			// return float4(blendTexUV.x ,blendTexUV.y,0,1);
-			// return blendCol;
+			
             return blendSoftLight(color, blendCol, _Strength);
         }
 	ENDHLSL
 	SubShader
 	{
-		ZWrite Off
-		Cull Off
-		ZTest Always
-
+		ZWrite Off Cull Off ZTest Always
 
 		Pass
 		{

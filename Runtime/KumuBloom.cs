@@ -96,7 +96,7 @@ sealed class KumuBloomRenderer : PostProcessEffectRenderer<KumuBloom>
         else
         {
             cmd.SetGlobalTexture("_SourceTex", context.source);
-            cmd.BlitFullscreenTriangle(currentSource, context.destination, ApplyBloomPass);
+            cmd.BlitFullscreenTriangle(currentSource, context.destination, sheet, ApplyBloomPass);
         }
         RenderTexture.ReleaseTemporary(currentSource);
     }
