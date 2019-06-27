@@ -46,7 +46,6 @@ namespace Kumu
         [Range(-1f, 1f), Tooltip("Distorts the bloom to give an anamorphic look. Negative values distort vertically, positive values distort horizontally.")]
         public FloatParameter anamorphicRatio = new FloatParameter { value = 0f };
 
-        // public BoolParameter debug = new BoolParameter();
 
     }
 
