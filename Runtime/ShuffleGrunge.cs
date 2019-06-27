@@ -50,7 +50,6 @@ public class ShuffleGrunge : MonoBehaviour
 
     private void ChangeTexture()
     {
-
         if (m_Grunge == null)
         {
             return;
