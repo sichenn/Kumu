@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 48a79b01ea5641d4aa6daa2e23605641, type: 3}
   m_Name: Bloom
   m_EditorClassIdentifier: 
-  active: 0
+  active: 1
   enabled:
     overrideState: 1
     value: 1
@@ -85,6 +85,12 @@ MonoBehaviour:
   blurType:
     overrideState: 0
     value: 0
+  downsample:
+    overrideState: 0
+    value: 0
+  iterations:
+    overrideState: 0
+    value: 1
   diffusion:
     overrideState: 1
     value: 6.1
@@ -92,9 +98,6 @@ MonoBehaviour:
     overrideState: 0
     value: 1
   anamorphicRatio:
-    overrideState: 0
-    value: 0
-  debug:
     overrideState: 0
     value: 0
 --- !u!114 &6112865828708221619
@@ -150,25 +153,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6769f0bc190635a49a7f5e9a02ff607e, type: 3}
   m_Name: KumuBlur
   m_EditorClassIdentifier: 
-  active: 0
+  active: 1
   enabled:
     overrideState: 1
     value: 1
   intensity:
-    overrideState: 0
-    value: 0
+    overrideState: 1
+    value: 1
   blurType:
     overrideState: 1
-    value: 0
+    value: 2
+  downsample:
+    overrideState: 1
+    value: 1
+  iterations:
+    overrideState: 1
+    value: 5
   diffusion:
     overrideState: 1
-    value: 3.8
+    value: 0.04
   threshold:
     overrideState: 0
     value: 0.45
   anamorphicRatio:
     overrideState: 0
     value: 1
-  debug:
-    overrideState: 0
-    value: 0

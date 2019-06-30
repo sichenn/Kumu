@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.Rendering.PostProcessing;
 
 namespace Kumu
@@ -6,7 +7,7 @@ namespace Kumu
     /// <summary>
     /// Convolution kernel size for the Depth of Field effect.
     /// </summary>
-    public enum BloomType
+    public enum BlurType
     {
 
         /// <summary>
@@ -17,25 +18,46 @@ namespace Kumu
         /// Box Blur.
         /// </summary>
         Box = 1,
+        /// <summary>
+        /// Blur on the x axis
+        /// </summary>
+        Horizontal = 2,
+        /// <summary>
+        /// Blur on the y axis
+        /// </summary>
+        Vertical = 3
+    }
+
+    public enum DownSample
+    {
+        None = 1,
+        x2 = 2,
+        x4 = 4,
+        x8 = 8,
+        x16 = 16
     }
 
     [System.Serializable]
-    public sealed class BloomTypeParameter : ParameterOverride<BloomType> { }
+    public sealed class BloomTypeParameter : ParameterOverride<BlurType> { }
+    [System.Serializable]
+    public sealed class DownsampleParameter : ParameterOverride<DownSample> { }
 
     [System.Serializable]
     [PostProcess(typeof(KumuBlurRenderer), PostProcessEvent.AfterStack, "Kumu/Blur")]
     public sealed class KumuBlur : PostProcessEffectSettings
     {
         [Range(0, 1)]
-        public FloatParameter intensity = new FloatParameter() { value = 1};
+        public FloatParameter intensity = new FloatParameter() { value = 1 };
         public BloomTypeParameter blurType = new BloomTypeParameter();
+        public DownsampleParameter downsample = new DownsampleParameter();
+        [Range(1, 8)]
+        public IntParameter iterations = new IntParameter() { value = 1 };
         /// <summary>
         /// The radius at which to blur
         /// </summary>
         /// <returns></returns>
-        [Range(1f, 10f), Tooltip("Changes the extent of veiling effects. For maximum quality, use integer values. Because this value changes the internal iteration count, You should not animating it as it may introduce issues with the perceived radius.")]
+        [Range(0, 10), Tooltip("Changes the extent of veiling effects. For maximum quality, use integer values. Because this value changes the internal iteration count, You should not animating it as it may introduce issues with the perceived radius.")]
         public FloatParameter diffusion = new FloatParameter() { value = 1 };
-
         [Range(0, 1)]
         public FloatParameter threshold = new FloatParameter() { value = 1 };
 
@@ -45,8 +67,6 @@ namespace Kumu
         /// </summary>
         [Range(-1f, 1f), Tooltip("Distorts the bloom to give an anamorphic look. Negative values distort vertically, positive values distort horizontally.")]
         public FloatParameter anamorphicRatio = new FloatParameter { value = 0f };
-
-
     }
 
     /// <summary>
@@ -58,7 +78,8 @@ namespace Kumu
         {
             DownSample = 0,
             Upsample = 2,
-            Combine = 4
+            Combine = 4,
+            Horizontal = 5
         }
 
         static class ShaderIDs
@@ -66,7 +87,7 @@ namespace Kumu
             internal static readonly int Filter = Shader.PropertyToID("_Filter");
             internal static readonly int Intensity = Shader.PropertyToID("_Intensity");
             internal static readonly int Radius = Shader.PropertyToID("_Radius");
-            internal static readonly int BloomTex = Shader.PropertyToID("_BloomTex");
+            internal static readonly int BlurTex = Shader.PropertyToID("_BlurTex");
             internal static readonly int SampleScale = Shader.PropertyToID("_SampleScale");
             internal static readonly int Iterations = Shader.PropertyToID("_Iterations");
         }
@@ -93,8 +114,8 @@ namespace Kumu
             {
                 m_Pyramid[i] = new Level
                 {
-                    down = Shader.PropertyToID("_BloomMipDown" + i),
-                    up = Shader.PropertyToID("_BloomMipUp" + i)
+                    down = Shader.PropertyToID("_BlurMipDown" + i),
+                    up = Shader.PropertyToID("_BlurMipUp" + i)
                 };
             }
         }
@@ -108,10 +129,106 @@ namespace Kumu
             cmd.BeginSample("Box Blur");
             sheet.properties.SetFloat(ShaderIDs.Intensity, settings.intensity.value);
             sheet.properties.SetFloat("_Threshold", settings.threshold.value);
-            Blur(context, cmd, sheet);
+            if (settings.blurType.value == BlurType.Horizontal)
+            {
+                BlurHorizontal(context, cmd, sheet);
+            }
+            else
+            {
+                Blur(context, cmd, sheet);
+            }
             LensDirt();
 
             cmd.EndSample("Box Blur");
+        }
+
+        private void BlurHorizontal(in PostProcessRenderContext context,
+                                    in UnityEngine.Rendering.CommandBuffer command,
+                                    in PropertySheet sheet)
+        {
+            // Negative anamorphic ratio values distort vertically - positive is horizontal
+            float ratio = Mathf.Clamp(settings.anamorphicRatio, -1, 1);
+            float ratioWidth = ratio < 0 ? -ratio : 0f;
+            float ratioHeight = ratio > 0 ? ratio : 0f;
+
+            // Calculate texture size
+            Vector2Int textureSize = new Vector2Int(
+                Mathf.FloorToInt(context.screenWidth / ((int)settings.downsample.value - ratioWidth)),
+                Mathf.FloorToInt(context.screenHeight / ((int)settings.downsample.value - ratioHeight))
+            );
+
+            bool singlePassDoubleWide = (context.stereoActive &&
+                                        (context.stereoRenderingMode == PostProcessRenderContext.StereoRenderingMode.SinglePass) &&
+                                        (context.camera.stereoTargetEye == StereoTargetEyeMask.Both));
+            int textureWidthStereo = singlePassDoubleWide ? textureSize.x * 2 : textureSize.x;
+
+            // calculate sample scale from diffusion
+            int maxWidthHeight = Mathf.Max(textureSize.x, textureSize.y);
+            float logs = Mathf.Log(maxWidthHeight, 2f) + Mathf.Min(settings.diffusion.value, 10) - 10f;
+            int logs_i = Mathf.FloorToInt(logs);
+            int iterations = settings.iterations.value;
+            float sampleScale = settings.diffusion.value;
+
+            // 1
+            // 0/0
+            // 2 
+            // 0/1 1/1
+
+            RenderTargetIdentifier lastBlur = context.source;
+            for (int i = 0; i < iterations / 2; i++)
+            {
+                int blurID = m_Pyramid[i].down;
+
+                sheet.properties.SetFloat(ShaderIDs.SampleScale, ((float)i / (iterations - 1) - 0.5f) * sampleScale);
+                Debug.Log((float)i / (iterations - 1));
+                context.GetScreenSpaceTemporaryRT(
+                                    command, blurID, 0, context.sourceFormat, RenderTextureReadWrite.Default,
+                                    FilterMode.Bilinear, textureWidthStereo, textureSize.y);
+                command.SetGlobalTexture(ShaderIDs.BlurTex, lastBlur);
+                command.BlitFullscreenTriangle(lastBlur, blurID, sheet, (int)Pass.Horizontal);
+
+                lastBlur = blurID;
+            }
+
+            // special case when there's only 1 iteration 
+            if (iterations == 1)
+            {
+                int blurID = m_Pyramid[0].down;
+
+                sheet.properties.SetFloat(ShaderIDs.SampleScale, sampleScale);
+                context.GetScreenSpaceTemporaryRT(
+                                    command, blurID, 0, context.sourceFormat, RenderTextureReadWrite.Default,
+                                    FilterMode.Bilinear, textureWidthStereo, textureSize.y);
+                command.SetGlobalTexture(ShaderIDs.BlurTex, lastBlur);
+                command.BlitFullscreenTriangle(lastBlur, blurID, sheet, (int)Pass.Horizontal);
+
+                lastBlur = blurID;
+            }
+
+            // skips the unnecessary blur in the middle 
+            for (int i = (iterations + 1) / 2; i < iterations; i++)
+            {
+                int blurID = m_Pyramid[i].down;
+
+                sheet.properties.SetFloat(ShaderIDs.SampleScale, ((float)i / (iterations - 1) - 0.5f) * sampleScale);
+                Debug.Log((float)i / (iterations - 1));
+                context.GetScreenSpaceTemporaryRT(
+                                    command, blurID, 0, context.sourceFormat, RenderTextureReadWrite.Default,
+                                    FilterMode.Bilinear, textureWidthStereo, textureSize.y);
+                command.SetGlobalTexture(ShaderIDs.BlurTex, lastBlur);
+                command.BlitFullscreenTriangle(lastBlur, blurID, sheet, (int)Pass.Horizontal);
+
+                lastBlur = blurID;
+            }
+
+            command.Blit(lastBlur, context.destination);
+            // command.BlitFullscreenTriangle(lastBlur, context.destination, sheet, (int)Pass.Combine);
+
+            // Cleanup
+            for (int i = 0; i < iterations - 1; i++)
+            {
+                command.ReleaseTemporaryRT(m_Pyramid[i].down);
+            }
         }
 
         private void Blur(in PostProcessRenderContext context,
@@ -180,7 +297,7 @@ namespace Kumu
                     (int)Pass.Upsample + (int)settings.blurType.value);
                 lastUp = mipUp;
             }
-            command.SetGlobalTexture(ShaderIDs.BloomTex, lastUp);
+            command.SetGlobalTexture(ShaderIDs.BlurTex, lastUp);
 
             // Cleanup
             for (int i = 0; i < m_Iterations; i++)

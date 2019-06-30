@@ -11,19 +11,21 @@
 		    #include "PostProcessing/Shaders/Colors.hlsl"
         #endif
 
+        #include "Sampling.hlsl"
+
 		TEXTURE2D_SAMPLER2D(_MainTex, sampler_MainTex);
-        TEXTURE2D_SAMPLER2D(_BloomTex, sampler_BloomTex);
+        TEXTURE2D_SAMPLER2D(_BlurTex, sampler_BlurTex);
 		float4 _MainTex_TexelSize;
 
         float   _Intensity;
-        float   _SampleScale;
         int     _Iterations;
+        float   _SampleScale;
         float   _Threshold;
 
         half4 Combine(half4 bloom, float2 uv)
         {
-            half4 color = SAMPLE_TEXTURE2D(_BloomTex, sampler_BloomTex, uv);
-            return bloom + color;
+            half4 color = SAMPLE_TEXTURE2D(_BlurTex, sampler_BlurTex, uv);
+            return (bloom + color);
         }
 
         half4 FragDownsampleStandard(VaryingsDefault i) : SV_Target
@@ -52,10 +54,40 @@
             return color; 
         }
 
+        half4 HorizontalBlur(TEXTURE2D_ARGS(tex, samplerTex), float2 uv, float2 texelSize, float sampleScale)
+        {
+            //get uv coordinate of sample
+            float2 offsetUV = uv + float2(sampleScale, 0);
+            half4 col = SAMPLE_TEXTURE2D(tex, samplerTex, offsetUV);
+            //add color at position to color
+            half4 blur = SAMPLE_TEXTURE2D(_BlurTex, sampler_BlurTex, uv);
+            return (col + blur) / 2;
+        }
+
+        half4 FragHorizontalBlur(VaryingsDefault i) : SV_Target
+        {
+            
+            return HorizontalBlur(  TEXTURE2D_PARAM(_MainTex, sampler_MainTex), i.texcoord, 
+                                    UnityStereoAdjustedTexelSize(_MainTex_TexelSize).xy, _SampleScale);
+            // float2 uv = i.texcoord + float2(_SampleScale, 0);
+            // half4 blur = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv);
+
+            // half4 col = 0;
+            // //iterate over blur samples
+            // for(int index=0;index<10;index++)
+            // {
+            //     //get uv coordinate of sample
+            //     float2 uv = i.texcoord + float2((index / 9.0 - 0.5) * _SampleScale, 0);
+            //     //add color at position to color
+            //     col += SAMPLE_TEXTURE2D(_MainTex,sampler_MainTex, uv);
+            // }
+            // return (col) / 10;
+        }
+
         half4 FragCombine(VaryingsDefault i) : SV_Target
         {
             half4 color = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.texcoord);
-            half4 blur = SAMPLE_TEXTURE2D(_BloomTex, sampler_BloomTex, i.texcoord);
+            half4 blur = SAMPLE_TEXTURE2D(_BlurTex, sampler_BlurTex, i.texcoord);
             
             // just blur
             return lerp(color, blur, _Intensity);
@@ -92,7 +124,6 @@
             ENDHLSL
         }
 
-        
         // 2: Upsample Standard
         Pass
         {
@@ -120,6 +151,16 @@
             HLSLPROGRAM
                 #pragma vertex VertDefault
                 #pragma fragment FragCombine
+            ENDHLSL
+        }
+
+        // 5: Horizontal Blur
+        Pass
+        {
+            Name "Horizontal"
+            HLSLPROGRAM
+                #pragma vertex VertDefault
+                #pragma fragment FragHorizontalBlur
             ENDHLSL
         }
 	}
