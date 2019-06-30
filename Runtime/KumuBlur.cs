@@ -25,7 +25,8 @@ namespace Kumu
         /// <summary>
         /// Blur on the y axis
         /// </summary>
-        Vertical = 3
+        Vertical = 3,
+        Radial = 4
     }
 
     public enum DownSample
@@ -79,7 +80,8 @@ namespace Kumu
             DownSample = 0,
             Upsample = 2,
             Combine = 4,
-            Horizontal = 5
+            Horizontal = 5,
+            Vertical = 6
         }
 
         static class ShaderIDs
@@ -129,14 +131,19 @@ namespace Kumu
             cmd.BeginSample("Box Blur");
             sheet.properties.SetFloat(ShaderIDs.Intensity, settings.intensity.value);
             sheet.properties.SetFloat("_Threshold", settings.threshold.value);
-            if (settings.blurType.value == BlurType.Horizontal)
+            switch (settings.blurType.value)
             {
-                BlurHorizontal(context, cmd, sheet);
+                case BlurType.Horizontal:
+                    BlurHorizontal(context, cmd, sheet);
+                    break;
+                case BlurType.Vertical:
+                    // TODO: do vertical blur
+                    break;
+                case BlurType.Standard:
+                    Blur(context, cmd, sheet);
+                    break;
             }
-            else
-            {
-                Blur(context, cmd, sheet);
-            }
+
             LensDirt();
 
             cmd.EndSample("Box Blur");
@@ -162,17 +169,8 @@ namespace Kumu
                                         (context.camera.stereoTargetEye == StereoTargetEyeMask.Both));
             int textureWidthStereo = singlePassDoubleWide ? textureSize.x * 2 : textureSize.x;
 
-            // calculate sample scale from diffusion
-            int maxWidthHeight = Mathf.Max(textureSize.x, textureSize.y);
-            float logs = Mathf.Log(maxWidthHeight, 2f) + Mathf.Min(settings.diffusion.value, 10) - 10f;
-            int logs_i = Mathf.FloorToInt(logs);
             int iterations = settings.iterations.value;
             float sampleScale = settings.diffusion.value;
-
-            // 1
-            // 0/0
-            // 2 
-            // 0/1 1/1
 
             RenderTargetIdentifier lastBlur = context.source;
             for (int i = 0; i < iterations / 2; i++)
@@ -180,11 +178,9 @@ namespace Kumu
                 int blurID = m_Pyramid[i].down;
 
                 sheet.properties.SetFloat(ShaderIDs.SampleScale, ((float)i / (iterations - 1) - 0.5f) * sampleScale);
-                Debug.Log((float)i / (iterations - 1));
                 context.GetScreenSpaceTemporaryRT(
                                     command, blurID, 0, context.sourceFormat, RenderTextureReadWrite.Default,
                                     FilterMode.Bilinear, textureWidthStereo, textureSize.y);
-                command.SetGlobalTexture(ShaderIDs.BlurTex, lastBlur);
                 command.BlitFullscreenTriangle(lastBlur, blurID, sheet, (int)Pass.Horizontal);
 
                 lastBlur = blurID;
@@ -199,7 +195,6 @@ namespace Kumu
                 context.GetScreenSpaceTemporaryRT(
                                     command, blurID, 0, context.sourceFormat, RenderTextureReadWrite.Default,
                                     FilterMode.Bilinear, textureWidthStereo, textureSize.y);
-                command.SetGlobalTexture(ShaderIDs.BlurTex, lastBlur);
                 command.BlitFullscreenTriangle(lastBlur, blurID, sheet, (int)Pass.Horizontal);
 
                 lastBlur = blurID;
@@ -211,21 +206,19 @@ namespace Kumu
                 int blurID = m_Pyramid[i].down;
 
                 sheet.properties.SetFloat(ShaderIDs.SampleScale, ((float)i / (iterations - 1) - 0.5f) * sampleScale);
-                Debug.Log((float)i / (iterations - 1));
                 context.GetScreenSpaceTemporaryRT(
                                     command, blurID, 0, context.sourceFormat, RenderTextureReadWrite.Default,
                                     FilterMode.Bilinear, textureWidthStereo, textureSize.y);
-                command.SetGlobalTexture(ShaderIDs.BlurTex, lastBlur);
                 command.BlitFullscreenTriangle(lastBlur, blurID, sheet, (int)Pass.Horizontal);
 
                 lastBlur = blurID;
             }
+            command.SetGlobalTexture(ShaderIDs.BlurTex, lastBlur);
 
-            command.Blit(lastBlur, context.destination);
-            // command.BlitFullscreenTriangle(lastBlur, context.destination, sheet, (int)Pass.Combine);
+            command.BlitFullscreenTriangle(context.source, context.destination, sheet, (int)Pass.Combine);
 
             // Cleanup
-            for (int i = 0; i < iterations - 1; i++)
+            for (int i = 0; i < iterations; i++)
             {
                 command.ReleaseTemporaryRT(m_Pyramid[i].down);
             }

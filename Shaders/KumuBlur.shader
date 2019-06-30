@@ -58,30 +58,16 @@
         {
             //get uv coordinate of sample
             float2 offsetUV = uv + float2(sampleScale, 0);
-            half4 col = SAMPLE_TEXTURE2D(tex, samplerTex, offsetUV);
+            half4 col = SAMPLE_TEXTURE2D(tex, samplerTex, uv);
             //add color at position to color
-            half4 blur = SAMPLE_TEXTURE2D(_BlurTex, sampler_BlurTex, uv);
+            half4 blur = SAMPLE_TEXTURE2D(tex, samplerTex, offsetUV);
             return (col + blur) / 2;
         }
 
         half4 FragHorizontalBlur(VaryingsDefault i) : SV_Target
         {
-            
             return HorizontalBlur(  TEXTURE2D_PARAM(_MainTex, sampler_MainTex), i.texcoord, 
                                     UnityStereoAdjustedTexelSize(_MainTex_TexelSize).xy, _SampleScale);
-            // float2 uv = i.texcoord + float2(_SampleScale, 0);
-            // half4 blur = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv);
-
-            // half4 col = 0;
-            // //iterate over blur samples
-            // for(int index=0;index<10;index++)
-            // {
-            //     //get uv coordinate of sample
-            //     float2 uv = i.texcoord + float2((index / 9.0 - 0.5) * _SampleScale, 0);
-            //     //add color at position to color
-            //     col += SAMPLE_TEXTURE2D(_MainTex,sampler_MainTex, uv);
-            // }
-            // return (col) / 10;
         }
 
         half4 FragCombine(VaryingsDefault i) : SV_Target
