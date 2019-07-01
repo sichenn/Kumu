@@ -19,13 +19,12 @@ namespace Kumu
         /// </summary>
         Box = 1,
         /// <summary>
-        /// Blur on the x axis
+        /// Blur on one dimension
         /// </summary>
-        Horizontal = 2,
+        OneDimensional = 2,
         /// <summary>
-        /// Blur on the y axis
+        /// Radial Blur
         /// </summary>
-        Vertical = 3,
         Radial = 4
     }
 
@@ -47,9 +46,9 @@ namespace Kumu
     [PostProcess(typeof(KumuBlurRenderer), PostProcessEvent.AfterStack, "Kumu/Blur")]
     public sealed class KumuBlur : PostProcessEffectSettings
     {
-        [Range(0, 1)]
-        public FloatParameter intensity = new FloatParameter() { value = 1 };
         public BloomTypeParameter blurType = new BloomTypeParameter();
+        [Range(0, 1)]
+        public FloatParameter blend = new FloatParameter() { value = 1 };
         public DownsampleParameter downsample = new DownsampleParameter();
         [Range(1, 8)]
         public IntParameter iterations = new IntParameter() { value = 1 };
@@ -57,17 +56,16 @@ namespace Kumu
         /// The radius at which to blur
         /// </summary>
         /// <returns></returns>
-        [Range(0, 10), Tooltip("Changes the extent of veiling effects. For maximum quality, use integer values. Because this value changes the internal iteration count, You should not animating it as it may introduce issues with the perceived radius.")]
+        [Range(0, 10)]
         public FloatParameter diffusion = new FloatParameter() { value = 1 };
         [Range(0, 1)]
         public FloatParameter threshold = new FloatParameter() { value = 1 };
-
         /// <summary>
-        /// Distorts the bloom to give an anamorphic look. Negative values distort vertically,
-        /// positive values distort horizontally.
+        /// Controls one directional blur's direction
         /// </summary>
-        [Range(-1f, 1f), Tooltip("Distorts the bloom to give an anamorphic look. Negative values distort vertically, positive values distort horizontally.")]
-        public FloatParameter anamorphicRatio = new FloatParameter { value = 0f };
+        /// <returns></returns>
+        [Range(0, 360)]
+        public FloatParameter angle = new FloatParameter() {value = 1};
     }
 
     /// <summary>
@@ -129,15 +127,12 @@ namespace Kumu
 
             // set shader parameters
             cmd.BeginSample("Box Blur");
-            sheet.properties.SetFloat(ShaderIDs.Intensity, settings.intensity.value);
+            sheet.properties.SetFloat(ShaderIDs.Intensity, settings.blend.value);
             sheet.properties.SetFloat("_Threshold", settings.threshold.value);
             switch (settings.blurType.value)
             {
-                case BlurType.Horizontal:
+                case BlurType.OneDimensional:
                     BlurHorizontal(context, cmd, sheet);
-                    break;
-                case BlurType.Vertical:
-                    // TODO: do vertical blur
                     break;
                 case BlurType.Standard:
                     Blur(context, cmd, sheet);
@@ -153,15 +148,10 @@ namespace Kumu
                                     in UnityEngine.Rendering.CommandBuffer command,
                                     in PropertySheet sheet)
         {
-            // Negative anamorphic ratio values distort vertically - positive is horizontal
-            float ratio = Mathf.Clamp(settings.anamorphicRatio, -1, 1);
-            float ratioWidth = ratio < 0 ? -ratio : 0f;
-            float ratioHeight = ratio > 0 ? ratio : 0f;
-
             // Calculate texture size
             Vector2Int textureSize = new Vector2Int(
-                Mathf.FloorToInt(context.screenWidth / ((int)settings.downsample.value - ratioWidth)),
-                Mathf.FloorToInt(context.screenHeight / ((int)settings.downsample.value - ratioHeight))
+                Mathf.FloorToInt(context.screenWidth / ((int)settings.downsample.value)),
+                Mathf.FloorToInt(context.screenHeight / ((int)settings.downsample.value))
             );
 
             bool singlePassDoubleWide = (context.stereoActive &&
@@ -228,15 +218,9 @@ namespace Kumu
                             in UnityEngine.Rendering.CommandBuffer command,
                             in PropertySheet sheet)
         {
-            // Negative anamorphic ratio values distort vertically - positive is horizontal
-            float ratio = Mathf.Clamp(settings.anamorphicRatio, -1, 1);
-            float ratioWidth = ratio < 0 ? -ratio : 0f;
-            float ratioHeight = ratio > 0 ? ratio : 0f;
-
-
             Vector2Int textureSize = new Vector2Int(
-                Mathf.FloorToInt(context.screenWidth / (2f - ratioWidth)),
-                Mathf.FloorToInt(context.screenHeight / (2f - ratioHeight))
+                Mathf.FloorToInt(context.screenWidth / 2f),
+                Mathf.FloorToInt(context.screenHeight / 2f)
             );
             bool singlePassDoubleWide = (context.stereoActive &&
                                         (context.stereoRenderingMode == PostProcessRenderContext.StereoRenderingMode.SinglePass) &&
