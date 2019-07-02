@@ -2,6 +2,7 @@
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.PostProcessing;
 
+
 namespace Kumu
 {
     /// <summary>
@@ -92,8 +93,6 @@ namespace Kumu
             internal static readonly int SampleScale = Shader.PropertyToID("_SampleScale");
             internal static readonly int Iterations = Shader.PropertyToID("_Iterations");
         }
-
-        RenderTexture[] textures = new RenderTexture[16];
 
         /// <summary>
         /// Store each down/upsample's ID

@@ -1,7 +1,7 @@
 ﻿Shader "Hidden/Kumu/Blur" 
 {
 	HLSLINCLUDE
-		 #if UNITY_VERSION > 201820
+        #if UNITY_VERSION > 201820
 		    #include "Packages/com.unity.postprocessing/PostProcessing/Shaders/StdLib.hlsl"
 			#include "Packages/com.unity.postprocessing/PostProcessing/Shaders/Sampling.hlsl"
 			#include "Packages/com.unity.postprocessing/PostProcessing/Shaders/Colors.hlsl"
@@ -10,8 +10,6 @@
 		    #include "PostProcessing/Shaders/Sampling.hlsl"
 		    #include "PostProcessing/Shaders/Colors.hlsl"
         #endif
-
-        #include "Sampling.hlsl"
 
 		TEXTURE2D_SAMPLER2D(_MainTex, sampler_MainTex);
         TEXTURE2D_SAMPLER2D(_BlurTex, sampler_BlurTex);
