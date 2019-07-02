@@ -19,7 +19,7 @@
 
         float   _Intensity;
         int     _Iterations;
-        float   _SampleScale;
+        float2   _SampleScale;
         float   _Threshold;
 
         half4 Combine(half4 bloom, float2 uv)
@@ -36,13 +36,12 @@
 
         half4 FragUpsampleStandard(VaryingsDefault i) : SV_Target
         {
-            half4 color = UpsampleTent(TEXTURE2D_PARAM(_MainTex, sampler_MainTex), i.texcoord, UnityStereoAdjustedTexelSize(_MainTex_TexelSize).xy, _SampleScale);                      
+            half4 color = UpsampleTent(TEXTURE2D_PARAM(_MainTex, sampler_MainTex), i.texcoord, UnityStereoAdjustedTexelSize(_MainTex_TexelSize).xy, _SampleScale.x);                      
             return color;
         }
 
 		half4 FragDownsample4(VaryingsDefault i) : SV_Target
         {
-            
             half4 color = DownsampleBox4Tap(TEXTURE2D_PARAM(_MainTex, sampler_MainTex), 
                                             i.texcoord, UnityStereoAdjustedTexelSize(_MainTex_TexelSize).xy);
             return color;
@@ -50,23 +49,23 @@
 		
 		half4 FragUpsampleBox(VaryingsDefault i) : SV_Target
         {
-            half4 color = UpsampleBox(TEXTURE2D_PARAM(_MainTex, sampler_MainTex), i.texcoord, UnityStereoAdjustedTexelSize(_MainTex_TexelSize).xy, _SampleScale);
+            half4 color = UpsampleBox(TEXTURE2D_PARAM(_MainTex, sampler_MainTex), i.texcoord, UnityStereoAdjustedTexelSize(_MainTex_TexelSize).xy, _SampleScale.x);
             return color; 
         }
 
-        half4 HorizontalBlur(TEXTURE2D_ARGS(tex, samplerTex), float2 uv, float2 texelSize, float sampleScale)
+        half4 OneDimensionalBlur(TEXTURE2D_ARGS(tex, samplerTex), float2 uv, float2 texelSize, float2 sampleScale)
         {
             //get uv coordinate of sample
-            float2 offsetUV = uv + float2(sampleScale, 0);
+            float2 offsetUV = uv + sampleScale;
             half4 col = SAMPLE_TEXTURE2D(tex, samplerTex, uv);
             //add color at position to color
             half4 blur = SAMPLE_TEXTURE2D(tex, samplerTex, offsetUV);
             return (col + blur) / 2;
         }
 
-        half4 FragHorizontalBlur(VaryingsDefault i) : SV_Target
+        half4 FragOneDimensionalBlur(VaryingsDefault i) : SV_Target
         {
-            return HorizontalBlur(  TEXTURE2D_PARAM(_MainTex, sampler_MainTex), i.texcoord, 
+            return OneDimensionalBlur(  TEXTURE2D_PARAM(_MainTex, sampler_MainTex), i.texcoord, 
                                     UnityStereoAdjustedTexelSize(_MainTex_TexelSize).xy, _SampleScale);
         }
 
@@ -146,7 +145,7 @@
             Name "Horizontal"
             HLSLPROGRAM
                 #pragma vertex VertDefault
-                #pragma fragment FragHorizontalBlur
+                #pragma fragment FragOneDimensionalBlur
             ENDHLSL
         }
 	}

@@ -65,7 +65,7 @@ namespace Kumu
         /// </summary>
         /// <returns></returns>
         [Range(0, 360)]
-        public FloatParameter angle = new FloatParameter() {value = 1};
+        public FloatParameter angle = new FloatParameter() { value = 1 };
     }
 
     /// <summary>
@@ -105,6 +105,7 @@ namespace Kumu
         }
         const int k_MaxPyramidSize = 16; // Just to make sure we handle 64k screens... Future-proof!
         int m_Iterations;
+        Vector2 m_SampleScale;
 
         public override void Init()
         {
@@ -126,9 +127,11 @@ namespace Kumu
             var sheet = context.propertySheets.Get(Shader.Find("Hidden/Kumu/Blur"));
 
             // set shader parameters
-            cmd.BeginSample("Box Blur");
             sheet.properties.SetFloat(ShaderIDs.Intensity, settings.blend.value);
             sheet.properties.SetFloat("_Threshold", settings.threshold.value);
+
+            cmd.BeginSample("Box Blur");
+
             switch (settings.blurType.value)
             {
                 case BlurType.OneDimensional:
@@ -160,14 +163,15 @@ namespace Kumu
             int textureWidthStereo = singlePassDoubleWide ? textureSize.x * 2 : textureSize.x;
 
             int iterations = settings.iterations.value;
-            float sampleScale = settings.diffusion.value;
+            m_SampleScale.x = Mathf.Cos(settings.angle * Mathf.Deg2Rad) * settings.diffusion.value;
+            m_SampleScale.y = Mathf.Sin(settings.angle * Mathf.Deg2Rad) * settings.diffusion.value;
 
             RenderTargetIdentifier lastBlur = context.source;
             for (int i = 0; i < iterations / 2; i++)
             {
                 int blurID = m_Pyramid[i].down;
 
-                sheet.properties.SetFloat(ShaderIDs.SampleScale, ((float)i / (iterations - 1) - 0.5f) * sampleScale);
+                sheet.properties.SetVector(ShaderIDs.SampleScale, ((float)i / (iterations - 1) - 0.5f) * m_SampleScale);
                 context.GetScreenSpaceTemporaryRT(
                                     command, blurID, 0, context.sourceFormat, RenderTextureReadWrite.Default,
                                     FilterMode.Bilinear, textureWidthStereo, textureSize.y);
@@ -181,7 +185,7 @@ namespace Kumu
             {
                 int blurID = m_Pyramid[0].down;
 
-                sheet.properties.SetFloat(ShaderIDs.SampleScale, sampleScale);
+                sheet.properties.SetVector(ShaderIDs.SampleScale, m_SampleScale);
                 context.GetScreenSpaceTemporaryRT(
                                     command, blurID, 0, context.sourceFormat, RenderTextureReadWrite.Default,
                                     FilterMode.Bilinear, textureWidthStereo, textureSize.y);
@@ -195,7 +199,7 @@ namespace Kumu
             {
                 int blurID = m_Pyramid[i].down;
 
-                sheet.properties.SetFloat(ShaderIDs.SampleScale, ((float)i / (iterations - 1) - 0.5f) * sampleScale);
+                sheet.properties.SetVector(ShaderIDs.SampleScale, ((float)i / (iterations - 1) - 0.5f) * m_SampleScale);
                 context.GetScreenSpaceTemporaryRT(
                                     command, blurID, 0, context.sourceFormat, RenderTextureReadWrite.Default,
                                     FilterMode.Bilinear, textureWidthStereo, textureSize.y);

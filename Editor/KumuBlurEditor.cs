@@ -12,6 +12,7 @@ namespace KumuBlurEditor
         SerializedParameterOverride m_Iterations;
         SerializedParameterOverride m_Diffusion;
         SerializedParameterOverride m_Threshold;
+        SerializedParameterOverride m_Angle;
 
         public override void OnEnable()
         {
@@ -21,15 +22,16 @@ namespace KumuBlurEditor
             m_Iterations = FindParameterOverride(x => x.iterations);
             m_Diffusion = FindParameterOverride(x => x.diffusion);
             m_Threshold = FindParameterOverride(x => x.threshold);
+            m_Angle = FindParameterOverride(x => x.angle);
         }
 
         public override void OnInspectorGUI()
         {
             DrawCommonSettings();
             int blurType = m_BlurType.value.intValue;
-            if(blurType == (int)BlurType.OneDimensional)
+            if (blurType == (int)BlurType.OneDimensional)
             {
-
+                PropertyField(m_Angle);
             }
         }
 
@@ -40,9 +42,8 @@ namespace KumuBlurEditor
             PropertyField(m_Diffusion);
             PropertyField(m_Downsample);
             PropertyField(m_Iterations);
-            
         }
-        
+
     }
 
 }

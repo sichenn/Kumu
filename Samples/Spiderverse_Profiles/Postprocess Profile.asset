@@ -63,12 +63,12 @@ MonoBehaviour:
   enabled:
     overrideState: 1
     value: 1
-  blend:
-    overrideState: 1
-    value: 1
   blurType:
     overrideState: 0
     value: 0
+  blend:
+    overrideState: 1
+    value: 1
   downsample:
     overrideState: 0
     value: 0
@@ -81,9 +81,9 @@ MonoBehaviour:
   threshold:
     overrideState: 0
     value: 1
-  anamorphicRatio:
+  angle:
     overrideState: 0
-    value: 0
+    value: 1
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -117,12 +117,12 @@ MonoBehaviour:
   enabled:
     overrideState: 1
     value: 1
-  blend:
-    overrideState: 0
-    value: 1
   blurType:
     overrideState: 0
     value: 0
+  blend:
+    overrideState: 0
+    value: 1
   downsample:
     overrideState: 0
     value: 0
@@ -135,9 +135,9 @@ MonoBehaviour:
   threshold:
     overrideState: 0
     value: 1
-  anamorphicRatio:
+  angle:
     overrideState: 0
-    value: 0
+    value: 1
 --- !u!114 &3666995189219670141
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -155,7 +155,7 @@ MonoBehaviour:
     overrideState: 1
     value: 1
   mode:
-    overrideState: 0
+    overrideState: 1
     value: 1
   intensity:
     overrideState: 0
@@ -244,12 +244,12 @@ MonoBehaviour:
   enabled:
     overrideState: 1
     value: 1
-  blend:
-    overrideState: 0
-    value: 1
   blurType:
     overrideState: 1
     value: 2
+  blend:
+    overrideState: 0
+    value: 1
   downsample:
     overrideState: 1
     value: 1
@@ -262,6 +262,6 @@ MonoBehaviour:
   threshold:
     overrideState: 0
     value: 0.45
-  anamorphicRatio:
+  angle:
     overrideState: 0
     value: 1
