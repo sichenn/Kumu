@@ -1,0 +1,16 @@
+{
+    "name": "com.sichenn.kumu",
+    "displayName": "Kumu Postprocessing",
+    "description": "Postprocessing library",
+    "version": "0.0.1",
+    "category": "Postprocessing",
+    "dependencies": {
+    },
+    "samples": [
+        {
+            "displayName": "Demo",
+            "description": "Showcase all postprocessing effects in Kumu",
+            "path": "Samples~/Demo"
+        }
+    ]
+}
