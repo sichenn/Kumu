@@ -10,8 +10,8 @@ a customizable blur effect
 # Quick Start
 ## Install
 1. run `git submodule add -b stable git@github.com:sichenn/Kumu.git Assets/Plugins/Kumu` at project folder
-1. run command "git submodule init"
-1. run commmand "git submodule update"
+1. run `git submodule init`
+1. run `git submodule update`
 
 ## Uninstall
 1. run `git submodule deinit -f -- Assets/Plugins/Kumu` at project folder 
