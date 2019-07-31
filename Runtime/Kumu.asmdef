@@ -1,7 +1,7 @@
 {
     "name": "Kumu",
     "references": [
-        "GUID:d60799ab2a985554ea1a39cd38695018"
+        "Unity.Postprocessing.Runtime"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [],
