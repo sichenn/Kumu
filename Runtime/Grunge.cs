@@ -3,49 +3,50 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering.PostProcessing;
 
-[System.Serializable]
-[PostProcess(typeof(GrungeRenderer), PostProcessEvent.AfterStack, "Kumu/Grunge")]
-public sealed class Grunge : PostProcessEffectSettings
+namespace Kumu
 {
-    [Range(0, 1)] public FloatParameter strength = new FloatParameter();
-    public TextureParameter blendTexture = new TextureParameter();
-    public Vector2Parameter tiling = new Vector2Parameter() { value = new Vector2(1, 1) };
-    [Tooltip("Adjust the texture's UV tiling to avoid stretching")]
-    public BoolParameter fitToScreenRatio = new BoolParameter();
-}
-
-sealed class GrungeRenderer : PostProcessEffectRenderer<Grunge>
-{
-    static class ShaderIDs
+    [System.Serializable]
+    [PostProcess(typeof(GrungeRenderer), PostProcessEvent.AfterStack, "Kumu/Grunge")]
+    public sealed class Grunge : PostProcessEffectSettings
     {
-        internal static readonly int Strength = Shader.PropertyToID("_Strength");
-        internal static readonly int BlendTex = Shader.PropertyToID("_BlendTex");
-        internal static readonly int Tiling = Shader.PropertyToID("_Tiling");
+        [Range(0, 1)] public FloatParameter strength = new FloatParameter();
+        public TextureParameter blendTexture = new TextureParameter();
+        public Vector2Parameter tiling = new Vector2Parameter() { value = new Vector2(1, 1) };
+        [Tooltip("Adjust the texture's UV tiling to avoid stretching")]
+        public BoolParameter fitToScreenRatio = new BoolParameter();
     }
 
-    public override void Init()
+    sealed class GrungeRenderer : PostProcessEffectRenderer<Grunge>
     {
-        // though the name is fitToScreenRatio we actually fit it to the camera's ratio
-    }
-
-    public override void Render(PostProcessRenderContext context)
-    {
-        if (settings.blendTexture.value == null)
+        static class ShaderIDs
         {
-            return;
+            internal static readonly int Strength = Shader.PropertyToID("_Strength");
+            internal static readonly int BlendTex = Shader.PropertyToID("_BlendTex");
+            internal static readonly int Tiling = Shader.PropertyToID("_Tiling");
         }
-        var sheet = context.propertySheets.Get(Shader.Find("Hidden/Kumu/Grunge"));
 
-		sheet.properties.SetVector(ShaderIDs.Tiling, settings.tiling);
-        sheet.properties.SetFloat(ShaderIDs.Strength, settings.strength);
-        sheet.properties.SetTexture(ShaderIDs.BlendTex, settings.blendTexture);
+        public override void Init()
+        {
+            // though the name is fitToScreenRatio we actually fit it to the camera's ratio
+        }
 
-        var cmd = context.command;
-        cmd.BeginSample("Grunge");
-        cmd.BlitFullscreenTriangle(context.source, context.destination, sheet, 0);
-        cmd.EndSample("Grunge");
+        public override void Render(PostProcessRenderContext context)
+        {
+            if (settings.blendTexture.value == null)
+            {
+                return;
+            }
+            var sheet = context.propertySheets.Get(Shader.Find("Hidden/Kumu/Grunge"));
 
+            sheet.properties.SetVector(ShaderIDs.Tiling, settings.tiling);
+            sheet.properties.SetFloat(ShaderIDs.Strength, settings.strength);
+            sheet.properties.SetTexture(ShaderIDs.BlendTex, settings.blendTexture);
+
+            var cmd = context.command;
+            cmd.BeginSample("Grunge");
+            cmd.BlitFullscreenTriangle(context.source, context.destination, sheet, 0);
+            cmd.EndSample("Grunge");
+
+        }
     }
-
-
 }

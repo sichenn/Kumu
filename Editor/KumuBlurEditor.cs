@@ -1,7 +1,7 @@
 ﻿using UnityEditor.Rendering.PostProcessing;
 using Kumu;
 
-namespace KumuBlurEditor
+namespace KumuEditor
 {
     [PostProcessEditor(typeof(KumuBlur))]
     public sealed class KumuBlurEditor : PostProcessEffectEditor<KumuBlur>

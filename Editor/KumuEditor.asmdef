@@ -1,0 +1,19 @@
+{
+    "name": "KumuEditor",
+    "references": [
+        "GUID:16d99876840230b4582747cc63d4c314",
+        "GUID:a35efad8797223d499f8c68b1f545dbc",
+        "GUID:d60799ab2a985554ea1a39cd38695018"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": []
+}

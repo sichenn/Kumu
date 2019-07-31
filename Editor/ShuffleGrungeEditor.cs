@@ -1,22 +1,24 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEditor;
+using Kumu;
 
-[CustomEditor(typeof(ShuffleGrunge))]
-public class ShuffleGrungeEdtor : Editor
+namespace KumuEditor
 {
-    private ShuffleGrunge grunge { get { return target as ShuffleGrunge; } }
-
-    public override void OnInspectorGUI()
+    [CustomEditor(typeof(ShuffleGrunge))]
+    public class ShuffleGrungeEdtor : Editor
     {
-        EditorGUI.BeginChangeCheck();
-        base.OnInspectorGUI();
-        if (EditorGUI.EndChangeCheck())
+        private ShuffleGrunge grunge { get { return target as ShuffleGrunge; } }
+
+        public override void OnInspectorGUI()
         {
-            if (Application.isPlaying)
+            EditorGUI.BeginChangeCheck();
+            base.OnInspectorGUI();
+            if (EditorGUI.EndChangeCheck())
             {
-                grunge.Refresh();
+                if (Application.isPlaying)
+                {
+                    grunge.Refresh();
+                }
             }
         }
     }
