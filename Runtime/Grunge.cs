@@ -23,18 +23,21 @@ sealed class GrungeRenderer : PostProcessEffectRenderer<Grunge>
         internal static readonly int Tiling = Shader.PropertyToID("_Tiling");
     }
 
+    private static Shader s_Shader;
+
     public override void Init()
     {
-        // though the name is fitToScreenRatio we actually fit it to the camera's ratio
+        s_Shader = Shader.Find("Hidden/Kumu/Grunge");
     }
 
     public override void Render(PostProcessRenderContext context)
     {
         if (settings.blendTexture.value == null)
         {
+            context.command.Blit(context.source, context.destination);
             return;
         }
-        var sheet = context.propertySheets.Get(Shader.Find("Hidden/Kumu/Grunge"));
+        var sheet = context.propertySheets.Get(s_Shader);
 
 		sheet.properties.SetVector(ShaderIDs.Tiling, settings.tiling);
         sheet.properties.SetFloat(ShaderIDs.Strength, settings.strength);

@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-3373152607984822117
+--- !u!114 &-934706312697268916
 MonoBehaviour:
   m_ObjectHideFlags: 3
   m_CorrespondingSourceObject: {fileID: 0}
@@ -9,34 +9,31 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6769f0bc190635a49a7f5e9a02ff607e, type: 3}
-  m_Name: KumuBlur
+  m_Script: {fileID: 11500000, guid: e99d1451288360947b8f5480b23433da, type: 3}
+  m_Name: Godray
   m_EditorClassIdentifier: 
   active: 0
   enabled:
     overrideState: 1
     value: 1
-  blurType:
+  intensity:
     overrideState: 1
-    value: 2
-  blend:
+    value: 0.5
+  tint:
     overrideState: 1
-    value: 1
-  downsample:
+    value: {r: 1, g: 1, b: 1, a: 1}
+  decay:
     overrideState: 1
-    value: 1
-  iterations:
+    value: 0.92
+  distance:
     overrideState: 1
-    value: 16
-  diffusion:
-    overrideState: 1
-    value: 0.3
-  threshold:
+    value: 0.406
+  quality:
     overrideState: 0
-    value: 1
-  angle:
-    overrideState: 1
     value: 0
+  lightPos:
+    overrideState: 1
+    value: {x: 1.09, y: 0.8}
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -50,4 +47,4 @@ MonoBehaviour:
   m_Name: Postprocess Profile
   m_EditorClassIdentifier: 
   settings:
-  - {fileID: -3373152607984822117}
+  - {fileID: -934706312697268916}
