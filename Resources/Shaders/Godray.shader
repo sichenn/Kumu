@@ -1,43 +1,7 @@
 ﻿Shader "Hidden/Kumu/Godray"
 {
     HLSLINCLUDE
-        #if UNITY_VERSION > 201820
-		    #include "Packages/com.unity.postprocessing/PostProcessing/Shaders/StdLib.hlsl"
-			#include "Packages/com.unity.postprocessing/PostProcessing/Shaders/Sampling.hlsl"
-			#include "Packages/com.unity.postprocessing/PostProcessing/Shaders/Colors.hlsl"
-		#else 
-		    #include "PostProcessing/Shaders/StdLib.hlsl"
-		    #include "PostProcessing/Shaders/Sampling.hlsl"
-		    #include "PostProcessing/Shaders/Colors.hlsl"
-        #endif
-
-		TEXTURE2D_SAMPLER2D(_MainTex, sampler_MainTex);
-        TEXTURE2D_SAMPLER2D(_CameraDepthTexture, sampler_CameraDepthTexture);
-        float2 _LightSourcePos; // light source position in screen space
-        half3 _Tint;
-        float _Decay;
-        float _Intensity;
-        float _Distance;
-        float2 _LightPos;
-        
-        inline float easeOutCubic(float x)
-        {
-            return 1 - pow(1 - x, 3);
-        }
-
-        half4 FragRadialBlur(VaryingsDefault i) : SV_Target
-        {
-            float2 deltaTexcoord = i.texcoord - _LightPos; // tmp hard-coded light pos
-            float4 result = 0;
-            for (int u = 0; u < 8; u++)
-            {
-                float2 shiftUV = i.texcoord - deltaTexcoord * (u + 1) / 8 * 0.1;
-                half4 c = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, shiftUV);
-                result += c;
-            }
-            //return float4(1, 0, 0, 1);
-            return result / 8;
-        }
+    #define GODRAY_ITERATION 1   
     ENDHLSL
 
     SubShader
@@ -82,12 +46,46 @@
 
         Pass // 3
         {
-            Name "Radial Blur"
+            Name "Radial Blur (High)"
             HLSLPROGRAM 
+                #define RADIAL_BLUR_ITERATION 16
+                #include "Godray.hlsl"
                 #pragma vertex VertDefault
                 #pragma fragment FragRadialBlur
             ENDHLSL
         }
         
+        Pass // 4
+        {
+            Name "Radial Blur (Mid)"
+            HLSLPROGRAM
+                #define RADIAL_BLUR_ITERATION 8
+                #include "Godray.hlsl"
+                #pragma vertex VertDefault
+                #pragma fragment FragRadialBlur
+            ENDHLSL
+        }
+
+        Pass // 5
+        {
+            Name "Radial Blur (Low)"
+            HLSLPROGRAM
+                #define RADIAL_BLUR_ITERATION 4
+                #include "Godray.hlsl"
+                #pragma vertex VertDefault
+                #pragma fragment FragRadialBlur
+            ENDHLSL
+        }
+
+        Pass // 6
+        {
+            Name "Combine Godray"
+            HLSLPROGRAM
+                #include "Godray.hlsl"
+                #pragma vertex VertDefault
+                #pragma fragment FragCombineGodray
+            ENDHLSL
+
+        }
     }
 }

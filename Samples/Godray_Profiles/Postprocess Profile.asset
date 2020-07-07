@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-934706312697268916
+--- !u!114 &-4516596563834574213
 MonoBehaviour:
   m_ObjectHideFlags: 3
   m_CorrespondingSourceObject: {fileID: 0}
@@ -12,28 +12,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e99d1451288360947b8f5480b23433da, type: 3}
   m_Name: Godray
   m_EditorClassIdentifier: 
-  active: 0
+  active: 1
   enabled:
     overrideState: 1
     value: 1
   intensity:
-    overrideState: 1
-    value: 0.5
+    overrideState: 0
+    value: 1
   tint:
-    overrideState: 1
+    overrideState: 0
     value: {r: 1, g: 1, b: 1, a: 1}
   decay:
-    overrideState: 1
-    value: 0.92
+    overrideState: 0
+    value: 0.5
   distance:
-    overrideState: 1
-    value: 0.406
+    overrideState: 0
+    value: 0.5
   quality:
     overrideState: 0
     value: 0
   lightPos:
-    overrideState: 1
-    value: {x: 1.09, y: 0.8}
+    overrideState: 0
+    value: {x: 0.5, y: 0.5}
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -47,4 +47,4 @@ MonoBehaviour:
   m_Name: Postprocess Profile
   m_EditorClassIdentifier: 
   settings:
-  - {fileID: -934706312697268916}
+  - {fileID: -4516596563834574213}
