@@ -2,8 +2,8 @@
 Post processing effects made for Unity
 
 ## Features
-### Distance Chromatic Aberration (in development)
-a chromatic aberration effect applied only on the focal point (in Spiderman: Into the Spiderverse)
+### Distance Chromatic Aberration
+a chromatic aberration effect applied only on the focal point (similar to Spiderman: Into the Spiderverse)
 
 ### Kumu Blur
 #### Box Blur
