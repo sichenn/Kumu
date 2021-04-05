@@ -68,7 +68,7 @@ namespace Kumu
 
             var sheet = context.propertySheets.Get(s_Shader);
 
-
+            
             // configure properties
             sheet.properties.SetFloat(ShaderIDs.Intensity, settings.intensity);
             sheet.properties.SetFloat(ShaderIDs.Decay, settings.decay);
