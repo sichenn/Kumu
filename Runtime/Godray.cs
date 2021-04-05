@@ -23,6 +23,7 @@ namespace Kumu
     public sealed class QualityParameter : ParameterOverride<Quality> { }
     public enum Quality
     {
+        VeryHigh,
         High,
         Mid,
         Low
@@ -41,13 +42,14 @@ namespace Kumu
 
         enum Pass
         {
-            GodrayHigh = 0,
-            GodrayMid = 1,
-            GodrayLow = 2,
-            RadialBlurHigh = 3,
-            RadialBlurMid = 4,
-            RadialBlurLow = 5,
-            Combine = 6
+            GodrayVeryHigh = 0,
+            GodrayHigh = 1,
+            GodrayMid = 2,
+            GodrayLow = 3,
+            RadialBlurHigh = 4,
+            RadialBlurMid = 5,
+            RadialBlurLow = 6,
+            Combine = 7
         }
 
         private static Shader s_Shader;
@@ -96,7 +98,13 @@ namespace Kumu
                                        cmd, godrayPass, 0, context.sourceFormat, RenderTextureReadWrite.Default,
                                        FilterMode.Bilinear, textureWidthStereo, textureSize.y);
 
-            if (settings.quality.value == Quality.High)
+            if (settings.quality.value == Quality.VeryHigh)
+            {
+                cmd.BlitFullscreenTriangle(context.source, firstPass, sheet, (int)Pass.GodrayVeryHigh);
+                cmd.BlitFullscreenTriangle(firstPass, godrayPass, sheet, (int)Pass.RadialBlurHigh);
+
+            }
+            else if (settings.quality.value == Quality.High)
             {
                 cmd.BlitFullscreenTriangle(context.source, firstPass, sheet, (int)Pass.GodrayHigh);
                 cmd.BlitFullscreenTriangle(firstPass, godrayPass, sheet, (int)Pass.RadialBlurHigh);

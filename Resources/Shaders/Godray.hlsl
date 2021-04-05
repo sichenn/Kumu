@@ -11,6 +11,7 @@
 #include "PostProcessing/Shaders/Colors.hlsl"
 #endif
 
+
 TEXTURE2D_SAMPLER2D(_MainTex, sampler_MainTex);
 TEXTURE2D_SAMPLER2D(_CameraDepthTexture, sampler_CameraDepthTexture);
 TEXTURE2D_SAMPLER2D(_GodrayTex, sampler_GodrayTex);
@@ -21,16 +22,22 @@ float _Intensity;
 float _Distance;
 float2 _LightPos;
 
+float4 _WorldSpaceLightPos0;
+
 half4 FragGodray(VaryingsDefault i) : SV_Target
 {
-    if (distance(i.texcoord, _LightPos) <= 0.01)
+    // debug sun pos
+    /*if (distance(i.texcoord, _LightPos) <= 0.01)
     {
         return float4(1, 0, 0, 1);
-    }
+    }*/
+    //return _WorldSpaceLightPos0;
     float depth = SAMPLE_TEXTURE2D(_CameraDepthTexture, sampler_CameraDepthTexture, i.texcoord).r;
     depth = Linear01Depth(depth);
 
-    float2 deltaTexcoord = i.texcoord - _LightPos; // tmp hard-coded light pos
+    //float2 deltaTexcoord = i.texcoord - _LightPos; // tmp hard-coded light pos
+    float2 deltaTexcoord = 2 * -_WorldSpaceLightPos0.xy; // tmp hard-coded light pos
+
     half godray = 0;
     float intensity = _Intensity;
 

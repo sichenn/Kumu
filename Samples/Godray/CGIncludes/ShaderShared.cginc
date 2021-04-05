@@ -427,7 +427,7 @@ uniform sampler2D _MainTex;
 #if ETC1_EXTERNAL_ALPHA
 //External alpha texture for ETC1 compression
 uniform sampler2D _AlphaTex;
-#endif //ETC1_EXTERNAL_ALPHA
+#endif //ETC1_EXTERNAL_ALPHAx
 
 #if _TEXTURE_BLEND
 uniform sampler2D _BlendTex;

@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Kumu_Sprites_Depth_My
-  m_Shader: {fileID: 4800000, guid: a42e32b08514d304daed44c95c78b5f6, type: 3}
+  m_Name: Sprite-DepthWrite
+  m_Shader: {fileID: 4800000, guid: 74bd11e9724fa714fbac63da02a5642b, type: 3}
   m_ShaderKeywords: ETC1_EXTERNAL_ALPHA _ALPHAPREMULTIPLY_ON _ALPHA_CLIP
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0

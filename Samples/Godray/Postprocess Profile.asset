@@ -17,19 +17,19 @@ MonoBehaviour:
     overrideState: 1
     value: 1
   intensity:
-    overrideState: 0
-    value: 1
+    overrideState: 1
+    value: 2
   tint:
-    overrideState: 0
+    overrideState: 1
     value: {r: 1, g: 1, b: 1, a: 1}
   decay:
-    overrideState: 0
-    value: 0.5
+    overrideState: 1
+    value: 0.6
   distance:
-    overrideState: 0
-    value: 0.5
+    overrideState: 1
+    value: 0.2
   quality:
-    overrideState: 0
+    overrideState: 1
     value: 0
   lightPos:
     overrideState: 0

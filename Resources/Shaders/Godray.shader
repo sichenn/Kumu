@@ -9,7 +9,20 @@
         // No culling or depth
         Cull Off ZWrite Off ZTest Always
 
-        Pass // 0
+         Pass // 0
+        {
+            Name "Godray (High)"
+            HLSLPROGRAM
+                #define GODRAY_ITERATION 64
+
+                #include "Godray.hlsl"
+
+                #pragma vertex VertDefault
+                #pragma fragment FragGodray
+            ENDHLSL
+        }
+
+        Pass // 1
         {
             Name "Godray (High)"
             HLSLPROGRAM
@@ -22,7 +35,7 @@
             ENDHLSL
         }
 
-        Pass // 1
+        Pass // 2
         {
             Name "Godray (Mid)"
             HLSLPROGRAM
@@ -33,7 +46,7 @@
             ENDHLSL
         }
 
-        Pass // 2
+        Pass // 3
         {
             Name "Godray (Low)"
             HLSLPROGRAM
@@ -44,7 +57,7 @@
             ENDHLSL
         }
 
-        Pass // 3
+        Pass // 4
         {
             Name "Radial Blur (High)"
             HLSLPROGRAM 
@@ -55,7 +68,7 @@
             ENDHLSL
         }
         
-        Pass // 4
+        Pass // 5
         {
             Name "Radial Blur (Mid)"
             HLSLPROGRAM
@@ -66,7 +79,7 @@
             ENDHLSL
         }
 
-        Pass // 5
+        Pass // 6
         {
             Name "Radial Blur (Low)"
             HLSLPROGRAM
@@ -77,7 +90,7 @@
             ENDHLSL
         }
 
-        Pass // 6
+        Pass // 7
         {
             Name "Combine Godray"
             HLSLPROGRAM
