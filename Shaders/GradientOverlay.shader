@@ -1,4 +1,4 @@
-﻿Shader "Hidden/Kumu/WaveDistortion"
+﻿Shader "Hidden/Kumu/GradientOverlay"
 {
 	HLSLINCLUDE
 	// for Unity 2018.2 or Newer
@@ -7,15 +7,10 @@
 		// #include "PostProcessing/Shaders/StdLib.hlsl"
 		#include "PSBlend.hlsl"
 
+		float _Strength;
+		TEXTURE2D_SAMPLER2D(_MainTex, sampler_MainTex);
+		TEXTURE2D_SAMPLER2D(_GradientTex, sampler_GradientTex);
 
-        TEXTURE2D_SAMPLER2D(_MainTex, sampler_MainTex);
-
-		half _Period;
-		half _Poisterization;
-		half _Speed;
-		half _Amplitude;
-		int _Debug;
-		half _Pow;
 
 		float Posterize(float In, float Steps)
 		{
@@ -24,13 +19,10 @@
 
 		float4 Frag(VaryingsDefault i) : SV_Target
 		{
-			float distort = sin(_Time.x * -10 * _Speed + i.texcoord.y  * _Period);
-			distort = Posterize(distort, _Poisterization) * _Amplitude * pow(i.texcoord.y, _Pow);
+			float4 color = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.texcoord);
+			float4 gradient = SAMPLE_TEXTURE2D(_GradientTex, sampler_GradientTex, i.texcoord);
 
-			float2 uv = float2(i.texcoord.x + distort * 0.01f, i.texcoord.y);
-			float4 color = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv);
-
-			return _Debug == 1 ? distort : color;
+			return gradient * _Strength + color;
         }
 	ENDHLSL
 	SubShader
