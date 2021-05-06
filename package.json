@@ -2,7 +2,7 @@
     "name": "com.sichenn.kumu",
     "displayName": "Kumu Postprocessing",
     "description": "Postprocessing library",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "category": "Postprocessing",
     "dependencies": {
     },
